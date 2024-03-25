@@ -17,6 +17,7 @@ type CLI struct {
 	Teams       []string      `help:"All of the teams to emit metrics for" env:"TEAMS"`
 	MaxSize     uint          `help:"The largest that the metric can grow" default:"100000"`
 	MaxIncrease int           `help:"The highest that the metric can be increased by" default:"10000"`
+	MinIncrease int			  `help:"The lowest that the metric can be increased by" default:"5000"`
 	Interval    time.Duration `help:"The interval at which the metric increases" default:"5s"`
 	ServerName  string        `help:"The name of the server" optional:""`
 }
@@ -33,7 +34,7 @@ var (
 func recordMetrics(cli *CLI) {
 	for {
 		for _, team := range cli.Teams {
-			toIncrease := rand.Intn(cli.MaxIncrease)
+			toIncrease := rand.Intn(cli.MaxIncrease-cli.MinIncrease) + cli.MinIncrease
 			if teamVals[team]+uint64(toIncrease) > uint64(cli.MaxSize) {
 				teamVals[team] = 0
 			}
